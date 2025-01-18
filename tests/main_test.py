@@ -39,7 +39,7 @@ class Example(BaseWindow):
 
 async def main():
 
-    bot = Bot("7577960749:AAHLs82t8q0dHgchXHt2J84LcBVPIDC3tJU")
+    bot = Bot("YOUR_BOT_TOKEN")
     dp.update.middleware(WindowMiddleware())
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
