@@ -1,8 +1,12 @@
 import logging
-
 import aiofiles
-from aiogram.types import Message, CallbackQuery, ReplyKeyboardMarkup, InlineKeyboardMarkup, ReplyKeyboardRemove, \
-    BufferedInputFile
+
+from aiogram.types import (Message,
+                           CallbackQuery,
+                           ReplyKeyboardMarkup,
+                           InlineKeyboardMarkup,
+                           ReplyKeyboardRemove,
+                           BufferedInputFile)
 from pydantic_core import ValidationError
 
 
@@ -37,7 +41,7 @@ class Send:
             else:
                 await self.event.message.edit_text(text=self.text, reply_markup=self.reply_markup)
         except ValidationError:
-            logging.warning("Mistake with keyboard deleting")
+            await self.event.message.answer(text=self.text, reply_markup=self.reply_markup)
 
     async def _reformat_photo(self):
         try:

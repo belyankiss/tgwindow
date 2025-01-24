@@ -1,0 +1,4 @@
+aiofiles~=24.1.0
+aiogram~=3.17.0
+pydantic_core~=2.27.2
+setuptools~=75.8.0
