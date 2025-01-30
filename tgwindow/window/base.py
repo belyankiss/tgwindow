@@ -7,7 +7,7 @@ from aiogram.types import (InlineKeyboardMarkup,
                            InlineKeyboardButton,
                            KeyboardButton)
 
-from src.errors import EmptyTextError, WrongFormatError
+from tgwindow.errors import EmptyTextError, WrongFormatError
 
 
 class BaseWindow:
@@ -57,7 +57,7 @@ class BaseWindow:
                     kb.add(button[0])
                 return kb.adjust(self.size_keyboard).as_markup()
             return InlineKeyboardMarkup(inline_keyboard=self._inline)
-        return []
+        return None
 
 
     def message(self) -> tuple[str, Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove]]:

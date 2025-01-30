@@ -3,8 +3,8 @@ from typing import Callable, Coroutine, Any
 
 from aiogram.types import Message, CallbackQuery
 
-from src.sender.sender import Send
-from src.window.base import RegisterWindow
+from tgwindow.sender.sender import Send
+from tgwindow.window.base import RegisterWindow
 
 
 def auto_window(func: Callable[..., Coroutine[Any, Any, None]]) -> Callable[..., Coroutine[Any, Any, None]]:

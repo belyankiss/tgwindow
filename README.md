@@ -31,9 +31,10 @@ pip install tgwindow
 ```python
 import asyncio
 from aiogram import Dispatcher, Bot
-from src.middleware import WindowMiddleware
+from tgwindow import WindowMiddleware
 
 dp = Dispatcher()
+
 
 async def main():
     bot = Bot("YOUR_BOT_TOKEN")
@@ -41,7 +42,8 @@ async def main():
     dp.update.middleware(WindowMiddleware())
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
-    
+
+
 if __name__ == '__main__':
     asyncio.run(main())
 
@@ -51,19 +53,18 @@ if __name__ == '__main__':
 ```python
 from aiogram.types import InlineKeyboardButton, KeyboardButton
 
-from src.window.base import BaseWindow
-from src.window.wrapper import auto_window
+from tgwindow import BaseWindow
+from tgwindow import auto_window
 
 
 class Example(BaseWindow):
-    #Buttons
+    # Buttons
     FIRST_BUTTON = InlineKeyboardButton(text="Button 1", callback_data="button_1")
     SECOND_BUTTON = InlineKeyboardButton(text="Button 2", callback_data="button_2")
     BUTTON_WITH_URL = InlineKeyboardButton(text="GitHub project", url="https://github.com/belyankiss/tgwindow")
     THIRD_BUTTON = KeyboardButton(text="Button 3")
     FOUR_BUTTON = KeyboardButton(text="Button 4")
     BACK_BUTTON = InlineKeyboardButton(text="BACK", callback_data="start")
-
 
     @auto_window
     async def hello(self, username: str):

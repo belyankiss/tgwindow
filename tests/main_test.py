@@ -3,9 +3,8 @@ import asyncio
 from aiogram import Dispatcher, Bot, F
 from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, KeyboardButton
 
-from src.middleware import WindowMiddleware
-from src.window.base import BaseWindow
-from src.window.wrapper import auto_window
+from tgwindow import WindowMiddleware, BaseWindow, auto_window
+
 
 dp = Dispatcher()
 

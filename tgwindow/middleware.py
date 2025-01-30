@@ -3,7 +3,7 @@ from typing import Callable, Dict, Any, Awaitable
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 
-from src.window.base import RegisterWindow, BaseWindow
+from tgwindow.window.base import RegisterWindow, BaseWindow
 
 
 class WindowMiddleware(BaseMiddleware):
