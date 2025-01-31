@@ -1,9 +1,10 @@
 import asyncio
+from typing import Literal
 
 from aiogram import Dispatcher, Bot, F
 from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, KeyboardButton
 
-from tgwindow import WindowMiddleware, BaseWindow, auto_window
+from tgwindow import WindowMiddleware, BaseWindow, auto_window, Inline, Reply
 
 
 dp = Dispatcher()
@@ -13,18 +14,19 @@ class Example(BaseWindow):
     #Buttons
     FIRST_BUTTON = InlineKeyboardButton(text="Button 1", callback_data="button_1")
     SECOND_BUTTON = InlineKeyboardButton(text="Button 2", callback_data="button_2")
-    BUTTON_WITH_URL = InlineKeyboardButton(text="GitHub project", url="https://github.com/belyankiss/tgwindow")
+    BUTTON_WITH_URL = Inline(text="GitHub project", url="https://github.com/belyankiss/tgwindow")
     THIRD_BUTTON = KeyboardButton(text="Button 3")
-    FOUR_BUTTON = KeyboardButton(text="Button 4")
+    FOUR_BUTTON = Reply(text="Button 4")
     BACK_BUTTON = InlineKeyboardButton(text="BACK", callback_data="start")
 
 
     @auto_window
-    async def hello(self, username: str):
+    async def hello(self, username: str, lang: Literal["ru", "en"]):
         """
         Можно добавлять фото и передавать в метод любые аргументы для приятной работы!!!
         Args:
             username: Как пример
+            lang: Язык пользователя
 
         Returns:
 
@@ -33,6 +35,8 @@ class Example(BaseWindow):
         self.text = f"Hello {username}"
         self.button(self.FIRST_BUTTON)
         self.button(self.SECOND_BUTTON)
+        # Можно добавлять кнопки с поддержкой языков. Поддерживает ru и en
+        self.button(Inline(ru="Привет", en="Hello", callback_data="hello_data", lang=lang))
 
     @auto_window
     async def reply(self):

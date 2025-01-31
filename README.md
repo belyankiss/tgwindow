@@ -9,6 +9,7 @@
 - Поддержка **Inline** и **Reply** клавиатур.
 - Гибкая настройка размеров клавиатур.
 - Простое взаимодействие с `Message` и `CallbackQuery`.
+- Добавлена поддержка на кнопках английского языка
 
 ---
 
@@ -51,27 +52,29 @@ if __name__ == '__main__':
 **Далее создаем окна.**
 
 ```python
+from typing import Literal
+
 from aiogram.types import InlineKeyboardButton, KeyboardButton
 
-from tgwindow import BaseWindow
-from tgwindow import auto_window
+from tgwindow import BaseWindow, auto_window, Inline, Reply
 
 
 class Example(BaseWindow):
     # Buttons
     FIRST_BUTTON = InlineKeyboardButton(text="Button 1", callback_data="button_1")
     SECOND_BUTTON = InlineKeyboardButton(text="Button 2", callback_data="button_2")
-    BUTTON_WITH_URL = InlineKeyboardButton(text="GitHub project", url="https://github.com/belyankiss/tgwindow")
+    BUTTON_WITH_URL = Inline(text="GitHub project", url="https://github.com/belyankiss/tgwindow")
     THIRD_BUTTON = KeyboardButton(text="Button 3")
-    FOUR_BUTTON = KeyboardButton(text="Button 4")
+    FOUR_BUTTON = Reply(text="Button 4")
     BACK_BUTTON = InlineKeyboardButton(text="BACK", callback_data="start")
 
     @auto_window
-    async def hello(self, username: str):
+    async def hello(self, username: str, lang: Literal["ru", "en"]):
         """
         Можно добавлять фото и передавать в метод любые аргументы для приятной работы!!!
         Args:
             username: Как пример
+            lang: Язык пользователя
 
         Returns:
 
@@ -80,6 +83,8 @@ class Example(BaseWindow):
         self.text = f"Hello {username}"
         self.button(self.FIRST_BUTTON)
         self.button(self.SECOND_BUTTON)
+        # Можно добавлять кнопки с поддержкой языков. Поддерживает ru и en
+        self.button(Inline(ru="Привет", en="Hello", callback_data="hello_data", lang=lang))
 
     @auto_window
     async def reply(self):
@@ -117,7 +122,7 @@ from tests.main_test import dp, Example
 @dp.callback_query(F.data == Example.BACK_BUTTON.callback_data)
 async def hello_message(event: Message | CallbackQuery, example: Example):
     username = event.from_user.username
-    await example.hello(event, username=username)
+    await example.hello(event, username=username, lang="en")
 
 @dp.callback_query(F.data == Example.SECOND_BUTTON.callback_data)
 async def answer_with_reply_keyboard(call: CallbackQuery, example: Example):
@@ -154,7 +159,22 @@ async def example_send(msg: Message, example: type[Example]):
 - **`self.delete_keyboard(bool)`** - булева для удаления reply-клавиатуры. Изначально False.
 - **`self.message()`** - возвращает кортеж. Где 1 значение это текст, 2 - клавиатура или None. Удобно использовать при отправке сообщений напрямую через бот. Тогда декоратор @auto_window использовать не нужно
 
----
+### 2. **`Inline`**
+`Inline` - обертка над классом InlineKeyboardButton с возможностью добавления английского языка
+- **`self.text`** - текст кнопки. Будет использоваться он, если нет других параметров.
+- **`self.ru`** - текст на русском
+- **`self.en`** - текст на английском (обязательно нужно указать параметр **`self.lang`**)
+- **`self.lang`** - язык пользователя "ru" или "en"
+- **`self.callback_data`** - коллбэк - один из обязательных параметров. Либо он, либо **`self.url`**
+- **`self.url`** - https ссылка. Нельзя указывать вместе с **`self.callback_data`**
+
+### 3. **`Reply`**
+`Reply` - обертка над классом KeyboardButton с возможностью добавления английского языка
+- **`self.text`** - текст кнопки. Будет использоваться он, если нет других параметров.
+- **`self.ru`** - текст на русском
+- **`self.en`** - текст на английском (обязательно нужно указать параметр **`self.lang`**)
+- **`self.lang`** - язык пользователя "ru" или "en"
+
 
 
 ## Требования

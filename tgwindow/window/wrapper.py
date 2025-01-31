@@ -24,12 +24,12 @@ def auto_window(func: Callable[..., Coroutine[Any, Any, None]]) -> Callable[...,
             Асинхронная обертка функции.
         """
     @wraps(func)
-    async def wrapper(event: Message | CallbackQuery, *args, **kwargs):
+    async def wrapper(event: Message | CallbackQuery, *args, **kwargs) -> Message:
         class_name = func.__qualname__.split(".")[0].lower()
         register = RegisterWindow()
         self = register.windows[class_name]()
         await func(self, *args, **kwargs)
         text, reply_markup = self.message()
         sender = Send(event=event, text=text, reply_markup=reply_markup, photo=self.photo)
-        await sender()
+        return await sender()
     return wrapper
