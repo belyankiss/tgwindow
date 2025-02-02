@@ -1,194 +1,154 @@
-# TGWindow
+from aiogram.types import CallbackQueryfrom aiogram.types import Messagefrom typing import Union
 
-**TGWindow** — это библиотека для удобного создания и управления окнами (сообщениями) в **Telegram** с использованием **Aiogram**. Она предоставляет базовый интерфейс для работы с текстом, кнопками и отправкой сообщений. Также можно прикреплять фото к сообщениям.
+# tgwindow
 
----
-
-## Возможности библиотеки
-- Удобное создание сообщений с текстом и кнопками.
-- Поддержка **Inline** и **Reply** клавиатур.
-- Гибкая настройка размеров клавиатур.
-- Простое взаимодействие с `Message` и `CallbackQuery`.
-- Добавлена поддержка на кнопках английского языка
-
----
+`tgwindow` — это библиотека для разработки Telegram-ботов с использованием библиотеки `aiogram`. Она предоставляет удобный способ для создания окон с клавишами, обработки пользовательских запросов, а также улучшает взаимодействие с ботами через встроенные миддлвары и статические окна.
 
 ## Установка
 
-Установите библиотеку через `pip` (если она доступна) или вручную.
+Для установки библиотеки используйте pip:
 
 ```bash
-pip install tgwindow
+    pip install tgwindow
 ```
 
----
+## Описание
+
+Библиотека `tgwindow` представляет собой набор инструментов для создания окон с кнопками, отправки сообщений и обработки запросов с использованием миддлваров в Telegram-ботах. В проекте реализованы следующие ключевые компоненты:
+
+- **Окна (Window)**: Классы, управляющие отображением сообщений и кнопок.
+- **Миддлвары (Middleware)**: Логика для обработки пользовательских данных до того, как запрос будет обработан.
+- **Регистрация окон**: Позволяет динамически регистрировать окна для обработки.
 
 ## Пример использования
 
-### 1. **Создание окна и отправка сообщения**
-
-Для начала необходимо запустить самого бота и подключить к нему WindowMiddleware
+### Пример 1: Создание статического окна с кнопками
 
 ```python
-import asyncio
-from aiogram import Dispatcher, Bot
-from tgwindow import WindowMiddleware
+from tgwindow import StaticWindow, Inline, Reply
 
-dp = Dispatcher()
-
-
-async def main():
-    bot = Bot("YOUR_BOT_TOKEN")
-    # Здесь подключаем WindowMiddleware
-    dp.update.middleware(WindowMiddleware())
-    await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot)
-
-
-if __name__ == '__main__':
-    asyncio.run(main())
+class MyWindow(StaticWindow):
+    text = "Welcome to My Bot!"
+    inline_button = Inline("Inline Button", callback_data="inline")
+    second_button = Inline(ru="Вторая кнопка", en="Second button", callback_data="second")
+    next_button = Inline(ru="Еще кнопка", en="Any button", url="https://github.com/belyankiss/tgwindow")
+    
+class ReplyKB(StaticWindow):
+   text = "Any text"
+   one = Reply(ru="Раз")
+   two = Reply(ru="Два", en="Two")
 
 ```
-**Далее создаем окна.**
+
+### Пример 2: Создание окна
 
 ```python
-from typing import Literal
+from typing import Union
 
-from aiogram.types import InlineKeyboardButton, KeyboardButton
-
-from tgwindow import BaseWindow, auto_window, Inline, Reply
-
-
-class Example(BaseWindow):
-    # Buttons
-    FIRST_BUTTON = InlineKeyboardButton(text="Button 1", callback_data="button_1")
-    SECOND_BUTTON = InlineKeyboardButton(text="Button 2", callback_data="button_2")
-    BUTTON_WITH_URL = Inline(text="GitHub project", url="https://github.com/belyankiss/tgwindow")
-    THIRD_BUTTON = KeyboardButton(text="Button 3")
-    FOUR_BUTTON = Reply(text="Button 4")
-    BACK_BUTTON = InlineKeyboardButton(text="BACK", callback_data="start")
-
-    @auto_window
-    async def hello(self, username: str, lang: Literal["ru", "en"]):
-        """
-        Можно добавлять фото и передавать в метод любые аргументы для приятной работы!!!
-        Args:
-            username: Как пример
-            lang: Язык пользователя
-
-        Returns:
-
-        """
-        # self.photo = "Path:/to/your/photo.jpg"
-        self.text = f"Hello {username}"
-        self.button(self.FIRST_BUTTON)
-        self.button(self.SECOND_BUTTON)
-        # Можно добавлять кнопки с поддержкой языков. Поддерживает ru и en
-        self.button(Inline(ru="Привет", en="Hello", callback_data="hello_data", lang=lang))
-
-    @auto_window
-    async def reply(self):
-        self.text = "This is reply keyboard"
-        self.button(self.THIRD_BUTTON)
-        self.button(self.FOUR_BUTTON)
-
-    @auto_window
-    async def inline_button(self):
-        self.text = "This message with inline keyboard"
-        self.button(self.BUTTON_WITH_URL)
-
-    @auto_window
-    async def with_back_button(self):
-        self.text = "Hello again!!!"
-        self.button(self.BUTTON_WITH_URL)
-        self.button(self.BACK_BUTTON)
-
-    async def for_example(self):
-        self.text = "Если вы хотите отправить самостоятельно, без автоотправки!"
-        self.button(self.FIRST_BUTTON)
-        self.button(self.SECOND_BUTTON)
-        self.button(self.BUTTON_WITH_URL)
-        self.size_keyboard = 2
-
-```
-**Теперь можно создавать handlers**
-```python
-from aiogram import F
 from aiogram.types import Message, CallbackQuery
-from tests.main_test import dp, Example
+
+from tgwindow import WindowBase, auto_window
+from tgwindow.buttons import Reply
+
+class ExampleWindow(WindowBase):
+
+    @auto_window
+    def hello(self, *args, photo, **kwargs):
+        # нужно писать *args, **kwargs обязательно
+        # для отправки фото можете добавить путь к фотографии, либо использовать объект фото телеграмм
+        self.photo = "path/to/photo"
+        self.photo = photo
+        # можете здесь вставлять текст
+        self.text = "Любой текст"
+        self.en = "Any text"
+        
+        self.add_window(MyWindow(self.lang))
+
+    @auto_window
+    def second(self, event: Union[Message, CallbackQuery], lang: str):
+        self.event = event # можно явно указать, но он добавится автоматически
+        self.lang = lang # так же можно явно указать. По дефолту ru
+        # можно добавить кнопок, но они должны быть одного типа!!!
+        self.add_button(Reply(ru="RU", en="EN"))
+        self.add_window(ReplyKB(lang))
+```
+
+### Пример 3: Использование миддлвара для добавления пользовательских данных
+
+```python
+from aiogram import Dispatcher, F
+from aiogram.types import Message, CallbackQuery
+from tgwindow.middleware import UserMiddleware
+
+dp = Dispatcher(bot)
+
+# Подключение миддлвара для обработки данных пользователя
+dp.middleware.setup(UserMiddleware())
 
 
 @dp.message(F.text == "/start")
-@dp.callback_query(F.data == Example.BACK_BUTTON.callback_data)
-async def hello_message(event: Message | CallbackQuery, example: Example):
-    username = event.from_user.username
-    await example.hello(event, username=username, lang="en")
+# Здесь, чтобы получить доступ к вашему классу, нужно использовать название класса в малом регистре
+# lang - язык пользователя. Настраивается в UserMiddleware
+async def start(message: Message, examplewindow: ExampleWindow, lang: str):
+   # Используем данные, добавленные миддлваром
+   # Есть два вида использования:
+   # c передачей события:
+   examplewindow.hello(message, lang=lang)  # lang указываем обязательно!
+   # или можно по-другому:
+   await message.answer(**examplewindow.hello(lang=lang))
 
-@dp.callback_query(F.data == Example.SECOND_BUTTON.callback_data)
-async def answer_with_reply_keyboard(call: CallbackQuery, example: Example):
-    await example.inline_button(call)
 
-@dp.callback_query(F.data == Example.FIRST_BUTTON.callback_data)
-async def any_message(msg: Message, example: Example):
-    await example.reply(msg)
-
-@dp.message(F.text == Example.THIRD_BUTTON.text)
-async def answer_reply_button(msg: Message, example: Example):
-    await example.with_back_button(msg)
-
-@dp.message()
-async def example_send(msg: Message, example: type[Example]):
-    example = example()
-    await example.for_example()
-    text, reply_markup = example.message()
-    await msg.answer(text=text, reply_markup=reply_markup)
+@dp.callback_query(F.data == MyWindow.inline_button)
+# или можно так
+@dp.callback_query(F.data.startswith(MyWindow.inline_button))
+async def check_callback(call: CallbackQuery, examplewindow: ExampleWindow, lang: str):
+    ...
 ```
-*ВНИМАНИЕ!* Чтобы получить доступ к вашему классу в handlers, необходимо использовать название вашего класса в малом регистре!!!
----
+
+### Библиотека также поддерживает уникализацию reply-кнопок и callback_data. Будет возбуждено исключение.
 
 
 
-## Основные классы
 
-### 1. **`BaseWindow`**
-`BaseWindow` — это базовый класс для создания окон. Он предоставляет методы для настройки текста и кнопок.
+## Структура проекта
 
-- **`self.text`** — текст сообщения.
-- **`self.size_keyboard(int)`** — настройка количества кнопок в ряду.
-- **`self.photo(str)`** — принимает путь к файлу фото локально или уникальный идентификатор с серверов телеграмм
-- **`self.delete_keyboard(bool)`** - булева для удаления reply-клавиатуры. Изначально False.
-- **`self.message()`** - возвращает кортеж. Где 1 значение это текст, 2 - клавиатура или None. Удобно использовать при отправке сообщений напрямую через бот. Тогда декоратор @auto_window использовать не нужно
+```
+tgwindow/
+│
+├── tgwindow/
+│   ├── __init__.py          # Главный модуль библиотеки
+│   ├── windows.py           # Окна (классы с кнопками и текстами)
+│   ├── buttons.py           # Классы для создания кнопок
+│   ├── middleware.py        # Миддлвары для обработки пользовательских данных
+│   ├── registration.py      # Реестр для регистрации окон
+│   ├── static_window.py     # Класс создания статических окон
+│   ├── wrapper.py           # декоратор
+│   └── sender.py            # Логика для отправки сообщений
+│
+├── tests/                   # Пример тестов     
+│
+├── setup.py                 # Конфигурация для установки библиотеки
+├── LICENSE                  # Лицензия
+└── README.md                # Документация
+```
 
-### 2. **`Inline`**
-`Inline` - обертка над классом InlineKeyboardButton с возможностью добавления английского языка
-- **`self.text`** - текст кнопки. Будет использоваться он, если нет других параметров.
-- **`self.ru`** - текст на русском
-- **`self.en`** - текст на английском (обязательно нужно указать параметр **`self.lang`**)
-- **`self.lang`** - язык пользователя "ru" или "en"
-- **`self.callback_data`** - коллбэк - один из обязательных параметров. Либо он, либо **`self.url`**
-- **`self.url`** - https ссылка. Нельзя указывать вместе с **`self.callback_data`**
+## Как запускать тесты
 
-### 3. **`Reply`**
-`Reply` - обертка над классом KeyboardButton с возможностью добавления английского языка
-- **`self.text`** - текст кнопки. Будет использоваться он, если нет других параметров.
-- **`self.ru`** - текст на русском
-- **`self.en`** - текст на английском (обязательно нужно указать параметр **`self.lang`**)
-- **`self.lang`** - язык пользователя "ru" или "en"
+Для запуска тестов можно использовать `pytest`:
 
+1. Установите необходимые зависимости:
 
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-## Требования
-- **Python 3.8+**
-- **Aiogram 3.0+**
+2. Запустите тесты:
 
----
+    ```bash
+    pytest
+    ```
 
 ## Лицензия
-Этот проект распространяется под лицензией **MIT**. Используйте свободно!
 
----
-
-## Обратная связь
-Если у вас есть вопросы или предложения, создавайте **Issue** или отправляйте PR.
-
----
+MIT
+```

@@ -1,12 +1,20 @@
-from tgwindow.middleware import WindowMiddleware
-from tgwindow.window.base import BaseWindow
-from tgwindow.window.wrapper import auto_window
-from tgwindow.buttons import Inline, Reply
+from .wrapper import auto_window
+from .buttons import Reply, Inline, TextMessage
+from .window_base import WindowBase
+from .middleware import UserMiddleware
+from .registration import Registration
+from .static_window import StaticWindow
+
 
 __all__ = [
-    "WindowMiddleware",
-    "BaseWindow",
     "auto_window",
+    "Reply",
     "Inline",
-    "Reply"
+    "WindowBase",
+    "UserMiddleware",
+    "Registration",
+    "StaticWindow",
+    "TextMessage"
 ]
+
+
