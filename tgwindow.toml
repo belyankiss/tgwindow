@@ -1,6 +1,6 @@
 [project]
 name = "tgwindow"
-version = "2.0.1"
+version = "2.0.2"
 authors = [
   { name="PyExecutor", email="belyankiss@gmail.com" },
 ]

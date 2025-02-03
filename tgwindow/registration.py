@@ -44,7 +44,7 @@ class Registration:
         :raises ValueError: Если класс с таким именем уже зарегистрирован.
         """
         # Приводим имя класса к нижнему регистру
-        name = obj.name
+        name = obj.__name__.lower()
 
         # Если окно с таким именем уже существует в реестре, выбрасываем исключение
         if name in cls._instance.windows:
