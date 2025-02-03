@@ -24,7 +24,7 @@ class WindowBase:
     функциональность для работы с клавиатурами (inline и reply).
     """
 
-    def __init__(self, *args):
+    def __init__(self, *args, **kwargs):
         """
         Инициализирует объект окна с начальным состоянием.
 
@@ -36,6 +36,10 @@ class WindowBase:
             if isinstance(arg, (Message, CallbackQuery)):
                 self.event = arg
                 break
+        self.name = self.__class__.__name__.lower()
+        for key, value in kwargs.items():
+            if key == "name":
+                self.name = value
         self.text: Optional[str] = None
         self.en: Optional[str] = None
         self.lang: Literal["ru", "en"] = "ru"

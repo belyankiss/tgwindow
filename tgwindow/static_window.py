@@ -26,7 +26,6 @@ class StaticWindow:
         """
         _instance = super().__new__(cls)
         _instance.keyboard = []  # Список для хранения кнопок
-        _instance.text = None
         _instance.dynamic_keyboard = None
         return _instance
 

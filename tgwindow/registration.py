@@ -17,7 +17,7 @@ class Registration:
     _instance = None
 
     # Словарь для хранения зарегистрированных окон (имя класса -> сам класс)
-    windows: dict[str, type["WindowBase"]] = {}
+    windows: dict[str, "WindowBase"] = {}
 
     def __new__(cls):
         """
@@ -33,7 +33,7 @@ class Registration:
         return cls._instance
 
     @classmethod
-    def add(cls, obj: Type["WindowBase"]):
+    def add(cls, obj: "WindowBase"):
         """
         Добавляет класс окна в реестр.
 
@@ -44,11 +44,11 @@ class Registration:
         :raises ValueError: Если класс с таким именем уже зарегистрирован.
         """
         # Приводим имя класса к нижнему регистру
-        name = obj.__name__.lower()
+        name = obj.name
 
         # Если окно с таким именем уже существует в реестре, выбрасываем исключение
         if name in cls._instance.windows:
-            raise ValueError(f"Класс с именем '{obj.__name__}' уже зарегистрирован! Измените название класса.")
+            raise ValueError(f"Класс с именем '{obj.name}' уже зарегистрирован! Измените название класса.")
 
         # Добавляем класс окна в реестр
         cls._instance.windows[name] = obj
